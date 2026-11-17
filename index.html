@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="as">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>অসমীয়া AI বন্ধু — আপোনাৰ সহজ অসমীয়া সহায়ক</title>
+
+  <!-- Google Fonts for crisp Assamese, Hindi, and English typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-page: #f7f5f0;
+      --bg-card: #ffffff;
+      --primary: #0f766e;         /* Deep soothing teal */
+      --primary-dark: #115e59;
+      --primary-light: #e6f4f1;
+      --gamosa-red: #c81e2b;      /* Traditional Assamese Gamosa crimson accent */
+      --gamosa-soft: #fdf2f3;
+      --gold-accent: #d97706;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --user-bubble: #0f766e;
+      --bot-bubble: #ffffff;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px rgba(15, 118, 110, 0.12);
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Main App Shell - Mobile Viewport Safe (100dvh) */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--bg-page);
+      position: relative;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Subtle Gamosa-inspired top decorative strip */
+    .gamosa-strip {
+      height: 6px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--gamosa-red) 0px,
+        var(--gamosa-red) 18px,
+        #ffffff 18px,
+        #ffffff 24px,
+        var(--gamosa-red) 24px,
+        var(--gamosa-red) 30px,
+        #ffffff 30px,
+        #ffffff 42px
+      );
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .app-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #14b8a6);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.25);
+      border: 2px solid #fff;
+      outline: 2px solid var(--gamosa-red);
+    }
+
+    .brand-text h1 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    .icon-btn.api-connected {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #047857;
+    }
+
+    .icon-btn.api-demo {
+      background: var(--gamosa-soft);
+      border-color: #fca5a5;
+      color: var(--gamosa-red);
+    }
+
+    /* Language Selector Bar */
+    .lang-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 7px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+    .lang-bar::-webkit-scrollbar { display: none; }
+
+    .lang-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .lang-pill {
+      border: 1px solid var(--border);
+      background: var(--bg-page);
+      color: var(--text-main);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+
+    .lang-pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(15, 118, 110, 0.25);
+    }
+
+    /* Chat Scroll Area */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    /* Welcome Card */
+    .welcome-card {
+      background: linear-gradient(145deg, #ffffff, #f0fdfa);
+      border: 1px solid #ccebe6;
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .welcome-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .welcome-desc {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 14px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 560px) {
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .quick-chip {
+      text-align: left;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+    }
+
+    .quick-chip:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .quick-chip-icon {
+      font-size: 1.2rem;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .quick-chip-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 2px;
+    }
+
+    .quick-chip-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Message Bubbles */
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 100%;
+      animation: fadeSlideIn 0.22s ease-out;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message-row.bot {
+      justify-content: flex-start;
+    }
+
+    .msg-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .message-row.bot .msg-avatar {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .bubble {
+      max-width: min(82%, 640px);
+      padding: 11px 15px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      line-height: 1.62;
+      word-wrap: break-word;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .message-row.user .bubble {
+      background: var(--user-bubble);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message-row.bot .bubble {
+      background: var(--bot-bubble);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
+    }
+
+    .bubble img.chat-photo {
+      max-width: 100%;
+      max-height: 260px;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 8px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .bubble-content p {
+      margin-bottom: 8px;
+    }
+    .bubble-content p:last-child {
+      margin-bottom: 0;
+    }
+    .bubble-content ul, .bubble-content ol {
+      padding-left: 20px;
+      margin: 6px 0;
+    }
+    .bubble-content li {
+      margin-bottom: 4px;
+    }
+    .bubble-content code {
+      background: rgba(0, 0, 0, 0.07);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-size: 0.88em;
+    }
+
+    .bubble-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      opacity: 0.75;
+    }
+
+    .speak-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--primary);
+      font-family: inherit;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .speak-btn:hover {
+      background: var(--primary-light);
+    }
+
+    /* Typing Indicator */
+    .typing-dots {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      padding: 4px 2px;
+    }
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Input Area */
+    .composer-wrapper {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 10px 14px 12px;
+      flex-shrink: 0;
+    }
+
+    /* Photo Preview Strip */
+    .photo-preview-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary-light);
+      border: 1px solid #b2dfd8;
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .photo-preview-bar.visible {
+      display: flex;
+    }
+
+    .photo-preview-bar img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #fff;
+    }
+
+    .photo-preview-info {
+      flex: 1;
+      font-size: 0.82rem;
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    .remove-photo-btn {
+      background: #fff;
+      border: 1px solid #fca5a5;
+      color: var(--gamosa-red);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .composer-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--bg-page);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 6px 8px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .composer-box:focus-within {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    .tool-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .tool-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .tool-btn.listening {
+      background: #fee2e2;
+      color: var(--gamosa-red);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    #chatInput {
+      flex: 1;
+      border: none;
+      background: transparent;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.96rem;
+      line-height: 1.45;
+      color: var(--text-main);
+      max-height: 120px;
+      padding: 8px 4px;
+    }
+
+    #chatInput::placeholder {
+      color: #9ca3af;
+    }
+
+    .send-btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: background 0.18s ease, transform 0.1s ease;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    .send-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .helper-hint {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Settings / API Key Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #fff;
+      width: 100%;
+      max-width: 460px;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      animation: fadeSlideIn 0.2s ease-out;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+    }
+
+    .close-modal {
+      background: var(--bg-page);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    .modal-body p {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .steps-box {
+      background: var(--bg-page);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-main);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-secondary {
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .brand-text p { display: none; }
+      .send-btn span.send-text { display: none; }
+      .send-btn { padding: 0 13px; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Decorative Assamese Gamosa Border -->
+  <div class="gamosa-strip" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-avatar" title="অসমীয়া AI বন্ধু">🤖</div>
+      <div class="brand-text">
+        <h1>অসমীয়া AI বন্ধু <span class="status-dot" title="সক্ৰিয়"></span></h1>
+        <p>শিক্ষা, সাধাৰণ জ্ঞান আৰু দৈনন্দিন সহায়ৰ সহজ বন্ধু</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" id="apiStatusBtn" class="icon-btn api-demo" title="Live AI Key সংযোগ কৰক">
+        🔑 <span id="apiStatusLabel">Demo</span>
+      </button>
+      <button type="button" id="newChatBtn" class="icon-btn" title="নতুন কথা-বতৰা আৰম্ভ কৰক">
+        🗑️ <span>নতুন</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Reply Language Selector (Assamese Default) -->
+  <div class="lang-bar" role="group" aria-label="উত্তৰৰ ভাষা বাছনি">
+    <span class="lang-label">উত্তৰৰ ভাষা:</span>
+    <button type="button" class="lang-pill active" data-lang="as">অসমীয়া (ডিফল্ট)</button>
+    <button type="button" class="lang-pill" data-lang="hi">हिन्दी</button>
+    <button type="button" class="lang-pill" data-lang="en">English</button>
+    <button type="button" class="lang-pill" data-lang="auto">স্বয়ংক্ৰিয় (Auto)</button>
+  </div>
+
+  <!-- Chat Messages Container -->
+  <main class="chat-area" id="chatArea">
+    <!-- Welcome Card -->
+    <section class="welcome-card" id="welcomeCard">
+      <div class="welcome-title">🙏 নমস্কাৰ! মই আপোনাৰ অসমীয়া AI বন্ধু</div>
+      <p class="welcome-desc">
+        মই <strong>অসমীয়া, हिन्दी আৰু English</strong> বুজি পাওঁ, আৰু সদায় <strong>সহজ অসমীয়াত</strong> উত্তৰ দিওঁ। আপুনি পঢ়া-শুনা, সাধাৰণ জ্ঞান, দৈনন্দিন জীৱনৰ প্ৰশ্ন বা যিকোনো <strong>ফটো আপলোড কৰি</strong> মোক সোধিব পাৰে!
+      </p>
+
+      <div class="quick-grid">
+        <button type="button" class="quick-chip" data-prompt="নিউটনৰ গতি সূত্ৰ কেইটা সহজ অসমীয়াত উদাহৰণসহ বুজাই দিয়া।">
+          <span class="quick-chip-icon">📚</span>
+          <div>
+            <div class="quick-chip-title">শিক্ষা (Education)</div>
+            <div class="quick-chip-sub">নিউটনৰ গতি সূত্ৰ সহজকৈ বুজাই দিয়া</div>
+          </div>
+        </button>
+
+        <button type="button" class="quick-chip" data-prompt="অসমৰ ৰাজধানী, প্ৰধান নদী আৰু কাজিৰঙা ৰাষ্ট্ৰীয় উদ্যানৰ বিষয়ে কোৱা।">
+          <span class="quick-chip-icon">🌍</span>
+          <div>
+            <div class="quick-chip-title">সাধাৰণ জ্ঞান (GK)</div>
+            <div class="quick-chip-sub">অসমৰ বিষয়ে গুৰুত্বপূৰ্ণ সাধাৰণ জ্ঞান</div>
+          </div>
+        </button>
+
+        <button type="button" class="quick-chip" data-prompt="দৈনন্দিন জীৱনত স্বাস্থ্য ভালে ৰাখিবলৈ ৫টা সহজ অভ্যাস কোৱা।">
+          <span class="quick-chip-icon">🏡</span>
+          <div>
+            <div class="quick-chip-title">দৈনন্দিন প্ৰশ্ন (Daily)</div>
+            <div class="quick-chip-sub">স্বাস্থ্য ভালে ৰখাৰ ৫টা সহজ উপায়</div>
+          </div>
+        </button>
+
+        <button type="button" class="quick-chip" id="quickPhotoBtn">
+          <span class="quick-chip-icon">📷</span>
+          <div>
+            <div class="quick-chip-title">ফটোৰ বিষয়ে সোধক</div>
+            <div class="quick-chip-sub">কিতাপ, অংক বা যিকোনো ফটো আপলোড কৰক</div>
+          </div>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chat Input & Photo Upload Area -->
+  <footer class="composer-wrapper">
+    <!-- Selected Image Preview -->
+    <div class="photo-preview-bar" id="photoPreviewBar">
+      <img id="photoPreviewImg" src="" alt="আপলোড কৰা ফটো" />
+      <div class="photo-preview-info">
+        📷 ফটোখন সাজু আছে! এতিয়া ফটোখনৰ বিষয়ে কিবা লিখক বা পোনপটীয়াকৈ পঠিয়াওক।
+      </div>
+      <button type="button" class="remove-photo-btn" id="removePhotoBtn" title="ফটো আঁতৰাওক">×</button>
+    </div>
+
+    <div class="composer-box">
+      <!-- Hidden File Input -->
+      <input type="file" id="photoInput" accept="image/*" hidden />
+
+      <!-- Upload Photo Button -->
+      <button type="button" class="tool-btn" id="uploadPhotoBtn" title="ফটো আপলোড কৰক (Photo Upload)">
+        📷
+      </button>
+
+      <!-- Voice Input Button -->
+      <button type="button" class="tool-btn" id="voiceBtn" title="কথা কৈ লিখক (Voice Input)">
+        🎤
+      </button>
+
+      <!-- Chat Textarea -->
+      <textarea
+        id="chatInput"
+        rows="1"
+        placeholder="ইয়াত আপোনাৰ প্ৰশ্ন লিখক (অসমীয়া, हिन्दी বা English)..."></textarea>
+
+      <!-- Send Button -->
+      <button type="button" class="send-btn" id="sendBtn" title="পঠিয়াওক">
+        <span class="send-text">পঠিয়াওক</span>
+        <span>➤</span>
+      </button>
+    </div>
+
+    <div class="helper-hint">
+      টিপ্‌ছ: ফটো আপলোড কৰিবলৈ 📷 টিপক বা ফটোখন ইয়ালৈ ড্ৰেগ কৰি আনক।
+    </div>
+  </footer>
+</div>
+
+<!-- API Key Settings Modal -->
+<div class="modal-backdrop" id="apiModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 id="modalTitle">🔑 Live AI সংযোগ কৰক (Gemini API)</h2>
+      <button type="button" class="close-modal" id="closeModalBtn">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        বৰ্তমান এপটো <strong>Demo Mode</strong>-ত চলি আছে। যিকোনো প্ৰশ্নৰ সঠিক উত্তৰ আৰু <strong>ফটো চাই বুজাবলৈ</strong> আপোনাৰ বিনামূলীয়া Gemini API Key সংযোগ কৰক:
+      </p>
+
+      <div class="steps-box">
+        <strong>সহজ ৩টা খোজ (Beginners Guide):</strong><br />
+        ১. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> খোলক।<br />
+        ২. <strong>"Create API Key"</strong> টিপি key-টো কপি কৰক।<br />
+        ৩. তলৰ বাকচত পেষ্ট কৰি <strong>Save</strong> টিপক। (আপোনাৰ key কেৱল আপোনাৰ ফোন/কম্পিউটাৰতেই সুৰক্ষিত হৈ থাকিব।)
+      </div>
+
+      <div class="form-group">
+        <label for="apiKeyInput">Gemini API Key:</label>
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label for="modelSelect">AI মডেল (Model):</label>
+        <select id="modelSelect">
+          <option value="gemini-3.8-flash">Gemini 3.8 Flash (সৰ্বশ্ৰেষ্ঠ আৰু দ্ৰুত)</option>
+          <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (অতি দ্ৰুত)</option>
+          <option value="gemini-4-argon">Gemini 4 Argon (উচ্চ বুদ্ধিমত্তা)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="clearKeyBtn">Key মচি দিয়ক</button>
+      <button type="button" class="btn-primary" id="saveKeyBtn">Save &amp; Connect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+    // --- DOM Elements ---
+    const chatArea = document.getElementById('chatArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const photoInput = document.getElementById('photoInput');
+    const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+    const quickPhotoBtn = document.getElementById('quickPhotoBtn');
+    const photoPreviewBar = document.getElementById('photoPreviewBar');
+    const photoPreviewImg = document.getElementById('photoPreviewImg');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const langPills = document.querySelectorAll('.lang-pill');
+    const quickChips = document.querySelectorAll('.quick-chip[data-prompt]');
+
+    // Modal Elements
+    const apiModal = document.getElementById('apiModal');
+    const apiStatusBtn = document.getElementById('apiStatusBtn');
+    const apiStatusLabel = document.getElementById('apiStatusLabel');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const modelSelect = document.getElementById('modelSelect');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+    const clearKeyBtn = document.getElementById('clearKeyBtn');
+
+    // --- App State ---
+    let replyLang = 'as'; // Default: Assamese
+    let pendingImage = null; // { base64, mimeType, dataUrl }
+    let conversationHistory = []; // Stores recent turns for context
+    let isGenerating = false;
+
+    const STORAGE_KEY = 'axomiya_ai_bondhu_api_key';
+    const STORAGE_MODEL = 'axomiya_ai_bondhu_model';
+
+    // Load saved settings
+    let apiKey = localStorage.getItem(STORAGE_KEY) || '';
+    let selectedModel = localStorage.getItem(STORAGE_MODEL) || 'gemini-3.8-flash';
+    modelSelect.value = selectedModel;
+    updateApiStatusUI();
+
+    function updateApiStatusUI() {
+      if (apiKey.trim()) {
+        apiStatusBtn.classList.remove('api-demo');
+        apiStatusBtn.classList.add('api-connected');
+        apiStatusLabel.textContent = 'Live AI';
+      } else {
+        apiStatusBtn.classList.remove('api-connected');
+        apiStatusBtn.classList.add('api-demo');
+        apiStatusLabel.textContent = 'Demo';
+      }
+    }
+
+    // --- Language Selector ---
+    langPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        langPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        replyLang = pill.dataset.lang;
+      });
+    });
+
+    // --- Quick Chips ---
+    quickChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chatInput.value = chip.dataset.prompt;
+        autoResizeTextarea();
+        handleSend();
+      });
+    });
+
+    quickPhotoBtn.addEventListener('click', () => photoInput.click());
+    uploadPhotoBtn.addEventListener('click', () => photoInput.click());
+
+    // --- Auto-Resize Textarea ---
+    function autoResizeTextarea() {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    }
+    chatInput.addEventListener('input', autoResizeTextarea);
+
+    // Enter to Send (Shift+Enter for new line)
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    sendBtn.addEventListener('click', handleSend);
+
+    // --- Photo Upload & Compression ---
+    photoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) processImageFile(file);
+      photoInput.value = '';
+    });
+
+    // Drag & drop support on chat area
+    chatArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+    chatArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        processImageFile(file);
+      }
+    });
+
+    // Paste image from clipboard
+    chatInput.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items || [];
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) processImageFile(file);
+          break;
+        }
+      }
+    });
+
+    function processImageFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('অনুগ্ৰহ কৰি কেৱল ফটো (Image file) বাছনি কৰক।');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize large photos to keep mobile uploads fast and lightweight
+          const MAX_DIM = 1024;
+          let { width, height } = img;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
+          const base64 = dataUrl.split(',')[1];
+
+          pendingImage = {
+            base64,
+            mimeType: 'image/jpeg',
+            dataUrl
+          };
+
+          photoPreviewImg.src = dataUrl;
+          photoPreviewBar.classList.add('visible');
+          chatInput.focus();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    removePhotoBtn.addEventListener('click', clearPendingImage);
+
+    function clearPendingImage() {
+      pendingImage = null;
+      photoPreviewImg.src = '';
+      photoPreviewBar.classList.remove('visible');
+    }
+
+    // --- Voice Input (Web Speech API) ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        chatInput.value = (chatInput.value ? chatInput.value + ' ' : '') + transcript;
+        autoResizeTextarea();
+      };
+
+      recognition.onerror = () => {
+        stopListeningUI();
+      };
+
+      recognition.onend = () => {
+        stopListeningUI();
+      };
+    }
+
+    function stopListeningUI() {
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+      voiceBtn.textContent = '🎤';
+    }
+
+    voiceBtn.addEventListener('click', () => {
+      if (!recognition) {
+        appendBotMessage('দুখিত, আপোনাৰ ব্ৰাউজাৰত ভইচ টাইপিং সুবিধা উপলব্ধ নহয়। অনুগ্ৰহ কৰি টাইপ কৰি সুধিব।');
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+        stopListeningUI();
+        return;
+      }
+      // Set voice language based on preference (Chrome supports hi-IN / en-IN widely, as-IN where available)
+      recognition.lang = replyLang === 'hi' ? 'hi-IN' : replyLang === 'en' ? 'en-IN' : 'as-IN';
+      try {
+        isListening = true;
+        voiceBtn.classList.add('listening');
+        voiceBtn.textContent = '⏹️';
+        recognition.start();
+      } catch {
+        stopListeningUI();
+      }
+    });
+
+    // --- Text-to-Speech (Read Aloud) ---
+    function speakText(text, btn) {
+      if (!('speechSynthesis' in window)) {
+        alert('আপোনাৰ ডিভাইচত পঢ়ি শুনোৱা সুবিধা উপলব্ধ নহয়।');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = replyLang === 'hi' ? 'hi-IN' : replyLang === 'en' ? 'en-IN' : 'as-IN';
+      utterance.rate = 0.95;
+
+      const origText = btn.textContent;
+      btn.textContent = '🔊 পঢ়ি আছে...';
+      utterance.onend = () => { btn.textContent = origText; };
+      utterance.onerror = () => { btn.textContent = origText; };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // --- New Chat ---
+    newChatBtn.addEventListener('click', () => {
+      conversationHistory = [];
+      clearPendingImage();
+      const messages = chatArea.querySelectorAll('.message-row');
+      messages.forEach(m => m.remove());
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    });
+
+    // --- Modal Controls ---
+    apiStatusBtn.addEventListener('click', () => {
+      apiKeyInput.value = apiKey;
+      modelSelect.value = selectedModel;
+      apiModal.classList.add('open');
+    });
+
+    closeModalBtn.addEventListener('click', () => apiModal.classList.remove('open'));
+    apiModal.addEventListener('click', (e) => {
+      if (e.target === apiModal) apiModal.classList.remove('open');
+    });
+
+    saveKeyBtn.addEventListener('click', () => {
+      apiKey = apiKeyInput.value.trim();
+      selectedModel = modelSelect.value;
+      localStorage.setItem(STORAGE_KEY, apiKey);
+      localStorage.setItem(STORAGE_MODEL, selectedModel);
+      updateApiStatusUI();
+      apiModal.classList.remove('open');
+
+      if (apiKey) {
+        appendBotMessage('✅ ধন্যবাদ! আপোনাৰ **Live AI** এতিয়া সফলভাৱে সংযোগ হৈছে। এতিয়া যিকোনো প্ৰশ্ন বা ফটো পঠিয়াওক!');
+      }
+    });
+
+    clearKeyBtn.addEventListener('click', () => {
+      apiKey = '';
+      apiKeyInput.value = '';
+      localStorage.removeItem(STORAGE_KEY);
+      updateApiStatusUI();
+      apiModal.classList.remove('open');
+    });
+
+    // --- System Prompt Builder ---
+    function getSystemInstruction() {
+      let langRule = '';
+      if (replyLang === 'as') {
+        langRule = `ALWAYS reply in simple, warm, everyday Assamese (সহজ অসমীয়া ভাষা) using proper Assamese script (use 'ৰ' and 'ৱ' properly). Even if the user asks in English, Hindi, or Romanized Assamese, understand them and reply in simple Assamese by default.`;
+      } else if (replyLang === 'hi') {
+        langRule = `Reply in simple, easy-to-understand Hindi (सरल हिन्दी). Still understand Assamese, Hindi, and English inputs.`;
+      } else if (replyLang === 'en') {
+        langRule = `Reply in simple, beginner-friendly English. Still understand Assamese, Hindi, and English inputs.`;
+      } else {
+        langRule = `Reply in simple Assamese (সহজ অসমীয়া) by default. If the user clearly writes in Hindi or English and expects that language, you may reply in that language, otherwise prefer simple Assamese.`;
+      }
+
+      return `You are "অসমীয়া AI বন্ধু" (Assamese AI Friend), a warm, friendly, helpful, and patient AI assistant designed especially for students and beginners in Assam and India.
+
+Core rules:
+1. ${langRule}
+2. Keep explanations clear, beginner-friendly, and structured with short paragraphs or bullet points.
+3. Help with education (school/college subjects, math, science, grammar), general knowledge (Assam, India, world), daily life questions (health tips, cooking, letters/applications, tech help), and analyzing uploaded photos (textbook pages, math problems, plants, food, objects, documents).
+4. Never be condescending. Address the user politely (e.g., "আপুনি" in Assamese).
+5. If an image is unclear, politely ask the user in simple language to upload a clearer photo.`;
+    }
+
+    // --- Send Message Flow ---
+    async function handleSend() {
+      if (isGenerating) return;
+
+      const rawText = chatInput.value.trim();
+      const imageToSend = pendingImage;
+
+      if (!rawText && !imageToSend) return;
+
+      const promptText = rawText || 'এই ফটোখনত কি আছে সহজ ভাষাত বুজাই দিয়া।';
+
+      // Clear input right away
+      chatInput.value = '';
+      autoResizeTextarea();
+      clearPendingImage();
+
+      // Render user bubble
+      appendUserMessage(rawText || '📷 [ফটো আপলোড কৰা হৈছে]', imageToSend?.dataUrl);
+
+      // Show typing bubble
+      isGenerating = true;
+      sendBtn.disabled = true;
+      const typingEl = appendTypingIndicator();
+
+      try {
+        let replyText = '';
+
+        if (apiKey.trim()) {
+          replyText = await callGeminiAPI(promptText, imageToSend);
+        } else {
+          // Friendly built-in Demo Mode response
+          await new Promise(r => setTimeout(r, 650));
+          replyText = getDemoResponse(promptText, Boolean(imageToSend));
+        }
+
+        typingEl.remove();
+        appendBotMessage(replyText);
+
+        // Save to local conversation history
+        conversationHistory.push({
+          role: 'user',
+          text: promptText,
+          image: imageToSend ? { mimeType: imageToSend.mimeType, base64: imageToSend.base64 } : null
+        });
+        conversationHistory.push({
+          role: 'model',
+          text: replyText
+        });
+        if (conversationHistory.length > 16) {
+          conversationHistory = conversationHistory.slice(-16);
+        }
+      } catch (err) {
+        typingEl.remove();
+        appendBotMessage(`⚠️ **ক্ষমা কৰিব, এটা সমস্যা হৈছে:**\n${err.message}\n\nঅনুগ্ৰহ কৰি আপোনাৰ ইণ্টাৰনেট বা 🔑 API Key পৰীক্ষা কৰক।`);
+      } finally {
+        isGenerating = false;
+        sendBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    // --- Gemini API Call (Multimodal: Text + Photo) ---
+    async function callGeminiAPI(promptText, imageObj) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${encodeURIComponent(apiKey.trim())}`;
+
+      // Build conversation contents (last 8 turns to keep payload fast)
+      const recentHistory = conversationHistory.slice(-8);
+      const contents = recentHistory.map(turn => {
+        const parts = [{ text: turn.text }];
+        if (turn.image) {
+          parts.push({
+            inlineData: {
+              mimeType: turn.image.mimeType,
+              data: turn.image.base64
+            }
+          });
+        }
+        return { role: turn.role, parts };
+      });
+
+      const currentParts = [{ text: promptText }];
+      if (imageObj) {
+        currentParts.push({
+          inlineData: {
+            mimeType: imageObj.mimeType,
+            data: imageObj.base64
+          }
+        });
+      }
+      contents.push({ role: 'user', parts: currentParts });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: getSystemInstruction() }]
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1200
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const msg = data?.error?.message || `HTTP ${response.status}`;
+        throw new Error(msg);
+      }
+
+      const candidateText = data?.candidates?.[0]?.content?.parts
+        ?.map(p => p.text || '')
+        .join('\n')
+        .trim();
+
+      if (!candidateText) {
+        throw new Error('AI-ৰ পৰা উত্তৰ পোৱা নগ’ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।');
+      }
+
+      return candidateText;
+    }
+
+    // --- Beginner-Friendly Demo Mode (Works offline / before adding API key) ---
+    function getDemoResponse(query, hasImage) {
+      const q = query.toLowerCase();
+
+      if (hasImage) {
+        return `📷 **আপুনি ফটোখন সফলভাৱে আপলোড কৰিছে!**
+
+বৰ্তমান মই **Demo Mode**-ত আছোঁ, গতিকে ফটোৰ ভিতৰৰ লিখা বা ছবি মই পঢ়িব পৰা নাই।
+
+ফটোখন চাই সঠিক উত্তৰ দিবলৈ:
+১. ওপৰত থকা **🔑 Demo** বুটামটো টিপক।
+২. এটা বিনামূলীয়া **Gemini API Key** পেষ্ট কৰি **Save** কৰক।
+তাৰ পিছতে মই আপোনাৰ যিকোনো ফটো (কিতাপ, অংক, গছ-গছনি বা নোট) সহজ অসমীয়াত বুজাই দিব পাৰিম!`;
+      }
+
+      if (q.includes('নমস্কাৰ') || q.includes('কেনে আছা') || q.includes('hello') || q.includes('hi') || q.includes('namaste')) {
+        if (replyLang === 'hi') {
+          return 'नमस्ते! मैं आपका **असमिया AI दोस्त** हूँ। आप पढ़ाई, सामान्य ज्ञान या रोज़मर्रा के सवाल पूछ सकते हैं!';
+        }
+        if (replyLang === 'en') {
+          return 'Hello! I am your **Assamese AI Friend**. Ask me anything about education, general knowledge, or daily life!';
+        }
+        return 'নমস্কাৰ! 🙏 মই আপোনাৰ **অসমীয়া AI বন্ধু**। মই ভালে আছোঁ! আপুনি কেনে আছে?\n\nআপুনি আজি পঢ়া-শুনা, সাধাৰণ জ্ঞান বা যিকোনো দৈনন্দিন কথা মোক সুধিব পাৰে।';
+      }
+
+      if (q.includes('নিউটন') || q.includes('newton')) {
+        return `📚 **নিউটনৰ গতি সূত্ৰ (সহজ অসমীয়াত):**
+
+বিজ্ঞানী আইজাক নিউটনে গতিৰ ৩টা সহজ সূত্ৰ দিছিল:
+
+* **প্ৰথম সূত্ৰ (জড়তা):** কোনো বস্তু যদি স্থিৰ হৈ আছে, তেন্তে বল প্ৰয়োগ নকৰালৈকে সি স্থিৰ হৈয়ে থাকিব। আৰু চলি থাকিলে চলিয়েই থাকিব। (যেনে: মেজত থোৱা কিতাপখন নিজাববীয়াকৈ নলৰে।)
+* **দ্বিতীয় সূত্ৰ (বল):** বস্তু এটাক যিমান বেছি জোৰেৰে ঠেলিব, সি সিমান বেগেৰে আগবাঢ়িব। ইয়াৰ সূত্ৰ হ'ল: **F = m × a**।
+* **তৃতীয় সূত্ৰ (ক্ৰিয়া-প্ৰতিক্ৰিয়া):** প্ৰতিটো ক্ৰিয়াৰে সমান আৰু বিপৰীত প্ৰতিক্ৰিয়া থাকে। (যেনে: নাৱৰ বঠা পিছফালে মাৰিলে নাও আগফালে যায়।)
+
+*(টিপ্‌ছ: যিকোনো অধ্যায়ৰ বিষয়ে সবিশেষ জানিবলৈ ওপৰত **🔑 Demo** টিপি বিনামূলীয়া AI Key সংযোগ কৰক।)*`;
+      }
+
+      if (q.includes('অসম') || q.includes('ৰাজধানী') || q.includes('কাজিৰঙা') || q.includes('assam')) {
+        return `🌍 **অসমৰ বিষয়ে গুৰুত্বপূৰ্ণ সাধাৰণ জ্ঞান:**
+
+* **ৰাজধানী:** দিছপুৰ (গুৱাহাটী)
+* **প্ৰধান নদী:** ব্ৰহ্মপুত্ৰ আৰু বৰাক
+* **কাজিৰঙা ৰাষ্ট্ৰীয় উদ্যান:** গোলাঘাট আৰু নগাঁও জিলাত অৱস্থিত। ই বিশ্ববিখ্যাত **এশিঙীয়া গঁড়**ৰ বাবে জনাজাত আৰু ইউনেস্কোৰ বিশ্ব ঐতিহ্য ক্ষেত্ৰ।
+* **ৰাজ্যিক উৎসৱ:** বিহু (বহাগ বিহু, কাতি বিহু আৰু মাঘ বিহু)
+* **ৰাজ্যিক পশু:** এশিঙীয়া গঁড় | **ৰাজ্যিক ফুল:** কপৌ ফুল`;
+      }
+
+      if (q.includes('স্বাস্থ্য') || q.includes('health') || q.includes('উপায়')) {
+        return `🏡 **স্বাস্থ্য ভালে ৰখাৰ ৫টা সহজ অভ্যাস:**
+
+১. **পৰ্যাপ্ত পানী খাওক:** দিনটোত কমেও ৭-৮ গিলাচ বিশুদ্ধ পানী পিব লাগে।
+২. **সতেজ শাক-পাচলি:** খাদ্যত সেউজীয়া শাক-পাচলি আৰু ফল-মূল ৰাখক।
+৩. **নিয়মীয়া ব্যায়াম:** ৰাতিপুৱা বা আবেলি কমেও ৩০ মিনিট খোজ কাঢ়ক।
+৪. **ভাল টোপনি:** প্ৰতিদিনে ৭-৮ ঘণ্টা শান্তিৰে শুব লাগে।
+৫. **মন ফুৰ্তি ৰাখক:** চিন্তা কমাই পৰিয়াল আৰু বন্ধুৰ লগত সময় কটাওক।`;
+      }
+
+      return `মই আপোনাৰ প্ৰশ্নটো বুজি পাইছোঁ: **"${query}"**
+
+বৰ্তমান এপটো **Demo Mode**-ত চলি আছে, সেয়ে মই কেৱল কেইটামান নমুনা উত্তৰহে দিব পাৰিছোঁ।
+
+সকলো বিষয়ৰ সম্পূৰ্ণ আৰু স্মাৰ্ট উত্তৰ পাবলৈ:
+👉 ওপৰত থকা **🔑 Demo** বুটামত টিপি আপোনাৰ বিনামূলীয়া **Gemini API Key** সংযোগ কৰক। তাৰ পিছত মই অসমীয়া, হিন্দী আৰু ইংৰাজীত যিকোনো প্ৰশ্নৰ উত্তৰ দিব পাৰিম!`;
+    }
+
+    // --- UI Message Render Helpers ---
+    function getTimeStr() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Lightweight safe Markdown to HTML formatter
+    function formatMessageHTML(text) {
+      const escaped = escapeHTML(text);
+      const lines = escaped.split('\n');
+      let html = '';
+      let inList = false;
+
+      for (const rawLine of lines) {
+        let line = rawLine
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/`(.+?)`/g, '<code>$1</code>');
+
+        const bulletMatch = line.match(/^[\*\-•]\s+(.*)/);
+        if (bulletMatch) {
+          if (!inList) {
+            html += '<ul>';
+            inList = true;
+          }
+          html += `<li>${bulletMatch[1]}</li>`;
+        } else {
+          if (inList) {
+            html += '</ul>';
+            inList = false;
+          }
+          if (line.trim()) {
+            html += `<p>${line}</p>`;
+          }
+        }
+      }
+      if (inList) html += '</ul>';
+      return html || `<p>${escaped}</p>`;
+    }
+
+    function appendUserMessage(text, imageDataUrl) {
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      if (imageDataUrl) {
+        const img = document.createElement('img');
+        img.src = imageDataUrl;
+        img.alt = 'আপুনি পঠিওৱা ফটো';
+        img.className = 'chat-photo';
+        bubble.appendChild(img);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'bubble-content';
+      content.innerHTML = formatMessageHTML(text);
+      bubble.appendChild(content);
+
+      const footer = document.createElement('div');
+      footer.className = 'bubble-footer';
+      footer.innerHTML = `<span>আপুনি • ${getTimeStr()}</span>`;
+      bubble.appendChild(footer);
+
+      row.appendChild(bubble);
+      chatArea.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendBotMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      const content = document.createElement('div');
+      content.className = 'bubble-content';
+      content.innerHTML = formatMessageHTML(text);
+      bubble.appendChild(content);
+
+      const footer = document.createElement('div');
+      footer.className = 'bubble-footer';
+
+      const timeSpan = document.createElement('span');
+      timeSpan.textContent = `অসমীয়া AI বন্ধু • ${getTimeStr()}`;
+
+      const speakBtn = document.createElement('button');
+      speakBtn.type = 'button';
+      speakBtn.className = 'speak-btn';
+      speakBtn.textContent = '🔊 শুনক';
+      speakBtn.addEventListener('click', () => speakText(text, speakBtn));
+
+      footer.appendChild(timeSpan);
+      footer.appendChild(speakBtn);
+      bubble.appendChild(footer);
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatArea.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendTypingIndicator() {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = `
+        <div class="typing-dots" aria-label="উত্তৰ ভাবি আছে...">
+          <span></span><span></span><span></span>
+        </div>`;
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatArea.appendChild(row);
+      scrollToBottom();
+      return row;
+    }
+
+    function scrollToBottom() {
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+  })();
+</script>
+</body>
+</html>
